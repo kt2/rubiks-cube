@@ -96,11 +96,7 @@ private:
 	std::vector<Sprite3D*> tmpcubes;
 	Vec3* v4[4] = {};
 	std::map<int, char> m = { { 1, 'a' },{ 3, 'b' },{ 5, 'c' },{ 7, 'd' } };
-	std::map<char, std::map<char, char>> transition = {
-		{'x' , {{'y' , 'z'}, {'z' , 'y'}}},
-		{'y' , {{'x' , 'z'}, {'z' , 'x'}}},
-		{'z' , {{'x' , 'y'}, {'y' , 'x'}}}
-	};
+
 	Vec3 clickvector;
 	char calcrq2(Quaternion pos) {
 	

@@ -49,8 +49,38 @@ public:
 	virtual bool init() override;
 	virtual void draw(Renderer *renderer, const Mat4 &transform, uint32_t flags) override;
 	void drawCustom(const Mat4 &transform, uint32_t flags);
-	CustomCommand* _customCommand;
+	void setTransition(char dir) {
+		oritransition = transition2[oritransition][dir];
+	}
+	char getTransition(char dir) {
+		return transition[oritransition][dir];
+	}
+private:
+	GLProgram* glProgram;
 
+	GLuint vao;
+
+	GLuint positionVBO;
+
+	GLuint colorVBO;
+
+	GLuint positionLocation;
+
+	GLuint colorLocation;
+
+	char oritransition = 'y';
+	CustomCommand _customCommand;
+
+	std::map<char, std::map<char, char>> transition2 = {
+		{ 'x' ,{ { 'y' , 'z' },{ 'z' , 'y' }, {'x', 'x' } }},
+		{ 'y' ,{ { 'x' , 'z' },{ 'z' , 'x' }, {'y', 'y' } }},
+		{ 'z' ,{ { 'x' , 'y' },{ 'y' , 'x' }, {'z', 'z' } }}
+	};
+	std::map<char, std::map<char, char>> transition = {
+		{ 'y' ,{ { 'y' , 'y' },{ 'x' , 'x' }, {'z', 'z'} }},
+		{ 'x' ,{ { 'y' , 'x' },{ 'x' , 'y' }, {'z', 'z'} }},
+		{ 'z' ,{ { 'y' , 'z' },{ 'x' , 'x' }, {'y', 'z'} }}
+	};
 
 };
 #endif // __cube_H__

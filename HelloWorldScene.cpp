@@ -2,6 +2,7 @@
 #include "editor-support/cocostudio/CocoStudio.h"
 #include "ui/CocosGUI.h"
 #include "DrawNode3D.h"
+#include "cube.h"
 
 
 
@@ -178,23 +179,8 @@ void HelloWorld::start() {
 		_layer3D->addChild(_camera);
 	}
 
-	_drawGrid = DrawNode3D::create();
 
-	//draw x
-	for (int j = -20; j <= 20; j++)
-	{
-		_drawGrid->drawLine(Vec3(-100, 0, 5 * j), Vec3(100, 0, 5 * j), Color4F(1, 0, 0, 1));
-	}
-	//draw z
-	for (int j = -20; j <= 20; j++)
-	{
-		_drawGrid->drawLine(Vec3(5 * j, 0, -100), Vec3(5 * j, 0, 100), Color4F(0, 0, 1, 1));
-	}
-	//draw y
-	_drawGrid->drawLine(Vec3(0, 0, 0), Vec3(0, 50, 0), Color4F(0, 1, 0, 1));
-	_layer3D->addChild(_drawGrid);
-
-	_layer3D->setAnchorPoint(Vec2(0.5, 0.5));
+//	_layer3D->setAnchorPoint(Vec2(0.5, 0.5));
 
 
 
@@ -208,6 +194,9 @@ void HelloWorld::start() {
 				float y = (j - positionOffset) * increment;
 				float z = (k - positionOffset) * increment;
 				_dn[count] = cube::create("Sprite3DTest/box_VertexCol.c3t");
+			/*	auto mat = Sprite3DMaterial::createWithFilename("Sprite3DTest/VertexColor.material");
+				_dn[count]->setMaterial(mat);*/
+
 				addcube(_dn[count], x, y, z);
 				log("%f, %f, %f", x, y, z);
 				_layer3D->addChild(_dn[count]);
@@ -545,6 +534,21 @@ void HelloWorld::start() {
 
 
 
+	//_drawGrid = DrawNode3D::create();
+
+	////draw x
+	//for (int j = -20; j <= 20; j++)
+	//{
+	//	_drawGrid->drawLine(Vec3(-100, 0, 5 * j), Vec3(100, 0, 5 * j), Color4F(1, 0, 0, 1));
+	//}
+	////draw z
+	//for (int j = -20; j <= 20; j++)
+	//{
+	//	_drawGrid->drawLine(Vec3(5 * j, 0, -100), Vec3(5 * j, 0, 100), Color4F(0, 0, 1, 1));
+	//}
+	////draw y
+	//_drawGrid->drawLine(Vec3(0, 0, 0), Vec3(0, 50, 0), Color4F(0, 1, 0, 1));
+	//_layer3D->addChild(_drawGrid);
 
 	//_dn2[0]->setVisible(1);
 	//_dn2[0]->setColor(Color3B::RED);
@@ -847,7 +851,7 @@ void HelloWorld::start() {
 		
 		int reverse = 1;
 		int targetaxis;
-		auto wtf = _drawGrid->getRotationQuat();
+	//	auto wtf = _drawGrid->getRotationQuat();
 		log("%f, %f, %f, %f", ss.x, ss.y, ss.z, ss.w);
 
 
@@ -1499,7 +1503,7 @@ void HelloWorld::start() {
 }
 
 
-void HelloWorld::setActiveGroup(int axis, Sprite3D* cube, int direction) {
+void HelloWorld::setActiveGroup(int axis, Sprite3D* sp, int direction) {
 	
 	testface = Node::create();
 	testface->setPosition3D(Vec3(0, 0, 0));
@@ -1511,7 +1515,7 @@ void HelloWorld::setActiveGroup(int axis, Sprite3D* cube, int direction) {
 	auto ori_rotate = testface->getRotation3D();
 
 	if (axis == AXISX) {
-		auto samex = cube->getPosition3D().x;
+		auto samex = sp->getPosition3D().x;
 		for (auto i : _dn) {
 			if (i->getPosition3D().x == samex) {
 				testface->addChild(i);
@@ -1521,7 +1525,7 @@ void HelloWorld::setActiveGroup(int axis, Sprite3D* cube, int direction) {
 		ori_rotate.x += 90 * direction;
 	}
 	if (axis == AXISY) {
-		auto samey = cube->getPosition3D().y;
+		auto samey = sp->getPosition3D().y;
 		for (auto i : _dn) {
 			if (i->getPosition3D().y == samey) {
 				testface->addChild(i);
@@ -1532,7 +1536,8 @@ void HelloWorld::setActiveGroup(int axis, Sprite3D* cube, int direction) {
 		ori_rotate.y += 90 * direction;
 	}
 	if (axis == AXISZ) {
-		auto samez = cube->getPosition3D().z;
+		auto samez = sp->getPosition3D().z;
+		
 		for (auto i : _dn) {
 			if (i->getPosition3D().z == samez) {
 				testface->addChild(i);
@@ -1548,11 +1553,14 @@ void HelloWorld::setActiveGroup(int axis, Sprite3D* cube, int direction) {
 	auto rot = RotateBy::create(1.0f, ori_rotate);
 	auto seq = Sequence::create(rot, CallFunc::create([=] {
 
-	    testface->removeAllChildrenWithCleanup(true);
+	    testface->removeAllChildren();
 		_layer3D->removeChild(testface);
 		
-		for (auto me : tmpcubes) {
+		for (auto c : tmpcubes) {
+			cube* me = dynamic_cast<cube*>(c);
 			_layer3D->addChild(me);
+			
+			
 			const float pi = (float)M_PI;
 			auto cs = cos(direction * 90 * pi / 180.0);
 			auto ss = sin(direction * 90 * pi / 180.0);
@@ -1568,12 +1576,32 @@ void HelloWorld::setActiveGroup(int axis, Sprite3D* cube, int direction) {
 			testnode->drawCube(testvec3, Color4F::RED);
 			//_layer3D->addChild(testnode);
 			if (axis == AXISZ) {
+				auto oriquat = me->getRotationQuat();
+				me->setRotationQuat(Quaternion(0, 0, 0, 1));
+				me->setRotation3D(Vec3(0, 0, direction * 90));
+				auto newquat = me->getRotationQuat();
+				me->setRotationQuat(newquat * oriquat);
 				me->setPosition3D(Vec3(round(x * cs + y * ss), round(-x * ss + y * cs), z));
+				
 			}
 			else if (axis == AXISX) {
+			
+				auto oriquat = me->getRotationQuat();
+				me->setRotationQuat(Quaternion(0, 0, 0, 1));
+				me->setRotation3D(Vec3(direction * 90, 0, 0 ));
+				auto newquat = me->getRotationQuat();
+				me->setRotationQuat(newquat * oriquat);
+
+
 				me->setPosition3D(Vec3(x, round(y * cs - z * ss), round(y * ss + z * cs)));
 			}
 			else if (axis == AXISY) {
+				auto oriquat = me->getRotationQuat();
+				me->setRotationQuat(Quaternion(0, 0, 0, 1));
+				me->setRotation3D(Vec3(0, direction * 90, 0));
+				auto newquat = me->getRotationQuat();
+				me->setRotationQuat(newquat * oriquat);
+
 				me->setPosition3D(Vec3(round(x * cs + z * ss), y, round(-x * ss + z * cs)));
 			}
 
@@ -1652,12 +1680,15 @@ void HelloWorld::addcube(Sprite3D* cube, float x, float y, float z) {
 		Vec3(0, 5, 0)
 	};
 	cube->setScale(5);
+	
+	//Sprite3DMaterial::createWithProperties()
 	//cube->setAnchorPoint(Vec2(0, 0));
 	//auto mat = Sprite3DMaterial::createWithFilename("Sprite3DTest/VertexColor.material");
-	//cube->setMaterial(mat);
+	cube->setRotation3D(Vec3(0, 0, 0));
+//	cube->setMaterial(mat);
 	auto rc = cocos2d::RandomHelper::random_int(1, 5);
 
-//	cube->setColor(randcolor[rc]);
+//cube->setColor(randcolor[rc]);
 
 //	auto mat = Sprite3DMaterial::createWithFilename("Sprite3DTest/VertexColor.material");
 	//cube->setMaterial(mat);
