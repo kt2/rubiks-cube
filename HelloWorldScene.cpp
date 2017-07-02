@@ -4,8 +4,6 @@
 #include "DrawNode3D.h"
 #include "cube.h"
 
-
-
 USING_NS_CC;
 using namespace cocos2d::ui;
 
@@ -38,7 +36,7 @@ bool HelloWorld::init()
 void HelloWorld::updateCameraTransform()
 {
 	Mat4 trans, rot, center;
-	Mat4::createTranslation(Vec3(0.0f, 10.0f, _distanceZ), &trans);
+	Mat4::createTranslation(Vec3(0.0f, 0.0f, _distanceZ), &trans);
 	Mat4::createRotation(_rotationQuat, &rot);
 	Mat4::createTranslation(_center, &center);
 	Mat4 result = center * rot * trans;
@@ -123,9 +121,6 @@ void HelloWorld::onTouchsMoved(const std::vector<Touch*> &touchs, Event *event)
 }
 
 
-
-
-
 void HelloWorld::start() {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -150,11 +145,142 @@ void HelloWorld::start() {
 	wlabel->setColor(Color3B::WHITE);
 	wlabel->setPosition(Vec2(40, 220));
 
-
 	addChild(xlabel);
 	addChild(ylabel);
 	addChild(zlabel);
 	addChild(wlabel);
+
+	auto btn0 = Button::create();
+	btn0->setTitleText("SWITCH");
+	btn0->setContentSize(Size(100, 20));
+	btn0->setTitleFontSize(20);
+	btn0->addTouchEventListener([=](Ref* pSender, Widget::TouchEventType type) {
+		if (type != Widget::TouchEventType::ENDED) { return; }
+		Button *btn = (Button*)pSender;
+		if (_operate == OperateCamType::RotateCamera) {
+			_operate = OperateCamType::MoveCamera;
+		}
+		else {
+			_operate = OperateCamType::RotateCamera;
+		}
+	});
+	btn0->setPosition(Vec2(100, 400));
+	addChild(btn0);
+
+	auto btn3 = Button::create();
+	btn3->setTitleText("HIDE LABEL");
+	btn3->setContentSize(Size(100, 20));
+	btn3->setTitleFontSize(20);
+	btn3->setPosition(Vec2(100, 120));
+	addChild(btn3);
+	btn3->addTouchEventListener([=](Ref* pSender,
+		Widget::TouchEventType type) {
+		if (type != Widget::TouchEventType::ENDED) { return; }
+		frontlb->setVisible(false);
+		backlb->setVisible(false);
+		toplb->setVisible(false);
+		bottomlb->setVisible(false);
+		rightlb->setVisible(false);
+		leftlb->setVisible(false);
+		_drawGrid->setVisible(false);
+
+	});
+
+	auto btn4 = Button::create();
+	btn4->setTitleText("SHOW LABEL");
+	btn4->setContentSize(Size(100, 20));
+	btn4->setTitleFontSize(20);
+	btn4->setPosition(Vec2(100, 140));
+	addChild(btn4);
+	btn4->addTouchEventListener([=](Ref* pSender,
+		Widget::TouchEventType type) {
+		if (type != Widget::TouchEventType::ENDED) { return; }
+		frontlb->setVisible(true);
+		backlb->setVisible(true);
+		toplb->setVisible(true);
+		bottomlb->setVisible(true);
+		rightlb->setVisible(true);
+		leftlb->setVisible(true);
+		_drawGrid->setVisible(true);
+
+	});											 
+
+
+	auto btn5 = Button::create();
+	btn5->setTitleText("SHUFFLE");
+	btn5->setContentSize(Size(100, 20));
+	btn5->setTitleFontSize(20);
+	btn5->addTouchEventListener([=](Ref* pSender, Widget::TouchEventType type) {
+		if (type != Widget::TouchEventType::ENDED) { return; }
+		Button *btn = (Button*)pSender;
+		for (int i = 0; i < 20; i++) {
+			shuffle();
+		}
+	});
+	btn5->setPosition(Vec2(100, 180));
+	addChild(btn5);
+
+	auto btn1 = Button::create();
+	btn1->setTitleText("FRONT CW");
+	btn1->setContentSize(Size(100, 20));
+	btn1->setTitleFontSize(20);
+	btn1->addTouchEventListener([=](Ref* pSender, Widget::TouchEventType type) {
+		if (type != Widget::TouchEventType::ENDED) { return; }
+		Button *btn = (Button*)pSender;
+		cubemove(0, 1);
+	});
+	btn1->setPosition(Vec2(100, 160));
+	addChild(btn1);
+
+
+
+	auto btn2 = Button::create();
+	btn2->setTitleText("RESET FACE");
+	btn2->setContentSize(Size(100, 20));
+	btn2->setTitleFontSize(20);
+	btn2->setPosition(Vec2(100, 80));
+	addChild(btn2);
+	btn2->addTouchEventListener([=](Ref* pSender, Widget::TouchEventType type) {
+		if (type != Widget::TouchEventType::ENDED) { return; }
+		Ray ray;
+		Vec3 snear(visibleSize.width / 2, visibleSize.height /2, -1.0f);
+		Vec3 sfar(visibleSize.width / 2, visibleSize.height / 2, 1.0f);
+
+		auto csize = Director::getInstance()->getWinSize();
+
+		_camera->unproject(csize, &snear, &snear);
+		_camera->unproject(csize, &sfar, &sfar);
+
+		ray._origin = snear;
+		ray._direction = sfar - snear;
+
+		_layer3D->setCameraMask(2);
+		float facedist = 0;
+		float cubedist = 0;
+		Sprite3D* targetface = nullptr;
+		Sprite3D* targetcube = nullptr;
+
+		for (auto da : _dn2) {
+			if (ray.intersects(da->getAABB())) {
+
+				auto ndist = da->getPosition3D().distance(snear);
+				if (!facedist) {
+					targetface = da;
+					facedist = ndist;
+				}
+				else if (ndist < facedist) {
+					targetface = da;
+					facedist = ndist;
+				}
+			}
+		}
+		if (targetface) {
+			auto face = targetface->getName();
+			switchface(face);
+		}
+	});
+
+
 
 
 
@@ -169,19 +295,20 @@ void HelloWorld::start() {
 	addChild(layer3D, 0);
 	_layer3D = layer3D;
 
-	if (_camera == nullptr)
-	{
+
+	auto layer3D2 = Layer::create();
+	addChild(layer3D2);
+
+
+	if (_camera == nullptr) {
 		_camera = Camera::createPerspective(60, (GLfloat)s.width / s.height, 1, 1000);
 		_camera->setCameraFlag(CameraFlag::USER1);
 		_camera->setPosition3D(Vec3(0, 10, 50));
 		_camera->lookAt(Vec3(0, 0, 0), Vec3(0, 1, 0));
 		_camera->retain();
 		_layer3D->addChild(_camera);
+		layer3D2->addChild(_camera);
 	}
-
-
-//	_layer3D->setAnchorPoint(Vec2(0.5, 0.5));
-
 
 
 	float increment = cubesize + spacing;
@@ -194,11 +321,9 @@ void HelloWorld::start() {
 				float y = (j - positionOffset) * increment;
 				float z = (k - positionOffset) * increment;
 				_dn[count] = cube::create("Sprite3DTest/box_VertexCol.c3t");
-			/*	auto mat = Sprite3DMaterial::createWithFilename("Sprite3DTest/VertexColor.material");
-				_dn[count]->setMaterial(mat);*/
-
+				
 				addcube(_dn[count], x, y, z);
-				log("%f, %f, %f", x, y, z);
+				
 				_layer3D->addChild(_dn[count]);
 				count++;
 			}
@@ -419,12 +544,6 @@ void HelloWorld::start() {
 	_layer3D->addChild(_dn_bottom[3]);
 	// BOTTOM END
 
-
-
-
-
-
-
 	_dn2[4] = Sprite3D::create("Sprite3DTest/box_VertexCol.c3t");
 	_dn2[4]->setName("right");
 	_dn2[4]->setTag(AXISZ);
@@ -531,112 +650,68 @@ void HelloWorld::start() {
 	_layer3D->addChild(_dn_left[3]);
 	// LEFT END
 
+	_drawGrid = DrawNode3D::create();
+
+	//draw x
+	for (int j = -20; j <= 20; j++)
+	{
+		_drawGrid->drawLine(Vec3(-100, 0, 5 * j), Vec3(100, 0, 5 * j), Color4F(1, 0, 0, 1));
+	}
+	//draw z
+	for (int j = -20; j <= 20; j++)
+	{
+		_drawGrid->drawLine(Vec3(5 * j, 0, -100), Vec3(5 * j, 0, 100), Color4F(0, 0, 1, 1));
+	}
+	//draw y
+	_drawGrid->drawLine(Vec3(0, 0, 0), Vec3(0, 50, 0), Color4F(0, 1, 0, 1));
 
 
 
-	//_drawGrid = DrawNode3D::create();
+	auto frontpos = _dn2[0]->getPosition3D();
+	frontlb = Label::create();
+	frontlb->setPosition3D(frontpos);
+	frontlb->setString("F");
 
-	////draw x
-	//for (int j = -20; j <= 20; j++)
-	//{
-	//	_drawGrid->drawLine(Vec3(-100, 0, 5 * j), Vec3(100, 0, 5 * j), Color4F(1, 0, 0, 1));
-	//}
-	////draw z
-	//for (int j = -20; j <= 20; j++)
-	//{
-	//	_drawGrid->drawLine(Vec3(5 * j, 0, -100), Vec3(5 * j, 0, 100), Color4F(0, 0, 1, 1));
-	//}
-	////draw y
-	//_drawGrid->drawLine(Vec3(0, 0, 0), Vec3(0, 50, 0), Color4F(0, 1, 0, 1));
-	//_layer3D->addChild(_drawGrid);
+	auto backpos = _dn2[1]->getPosition3D();
+	backlb = Label::create();
+	backlb->setPosition3D(backpos);
+	backlb->setString("B");
 
-	//_dn2[0]->setVisible(1);
-	//_dn2[0]->setColor(Color3B::RED);
-	//std::string lbtext[6] = { "F", "B", "R", "L", "T", "M" };
-	//int tc = 0;
-	//for (auto i : _dn2) {
+	auto toppos = _dn2[2]->getPosition3D();
+	auto toprot = _dn2[2]->getRotation3D();
+	toplb = Label::create();
+	toplb->setPosition3D(toppos);
+	toplb->setRotation3D(toprot);
+	toplb->setString("T");
 
-	//	i->setVisible(1);
-	//	i->setColor(Color3B::RED);
-	//	i->setOpacity(40);
-	//	tc++;
-	//}
+	auto bottompos = _dn2[3]->getPosition3D();
+	auto bottomrot = _dn2[3]->getRotation3D();
+	bottomlb = Label::create();
+	bottomlb->setPosition3D(bottompos);
+	bottomlb->setRotation3D(bottomrot);
+	bottomlb->setString("M");
 
+	auto rightpos = _dn2[4]->getPosition3D();
+	rightlb = Label::create();
+	rightlb->setPosition3D(rightpos);
+	rightlb->setRotation3D(Vec3(0, 90, 0));
+	rightlb->setString("R");
 
-
-
-	//auto ftl = Vec3(-maxextend, maxextend, maxextend);
-	//auto ftr = Vec3(maxextend, maxextend, maxextend);
-	//auto fbl = Vec3(-maxextend, -maxextend, maxextend);
-	//auto fbr = Vec3(maxextend, -maxextend, maxextend);
-
-	//auto btl = Vec3(-maxextend, maxextend, -maxextend);
-	//auto btr = Vec3(maxextend, maxextend, -maxextend);
-	//auto bbl = Vec3(-maxextend, -maxextend, -maxextend);
-	//auto bbr = Vec3(maxextend, -maxextend, -maxextend);
-
-	//DrawNode3D* frontp = DrawNode3D::create();
-	//frontp->setab(fbl, ftr);
-	//frontp->setName("front");
-	//Vec3 frontpvec[4] = { ftl, ftr, fbr, fbl };
-	//frontp->drawRect(frontpvec);
-	//frontp->setContentSize(Size(2 * maxextend, 2 * maxextend));
-	//_layer3D->addChild(frontp);
-	//faces[0] = frontp;
-
-	//DrawNode3D* backp = DrawNode3D::create();
-	//Vec3 backvec[4] = { btl, btr, bbr, bbl };
-	//backp->setab(bbl, btr);
-	//backp->setName("back");
-	//backp->drawRect(backvec);
-	//backp->setContentSize(Size(2 * maxextend, 2 * maxextend));
-	//_layer3D->addChild(backp);
-	//faces[1] = backp;
+	auto leftpos = _dn2[5]->getPosition3D();
+	leftlb = Label::create();
+	leftlb->setPosition3D(leftpos);
+	leftlb->setRotation3D(Vec3(0,-90,0));
+	leftlb->setString("L");
 
 
-	//DrawNode3D* topp = DrawNode3D::create();
-	//Vec3 topvec[4] = { ftl, ftr, btr, btl };
-	//topp->setab(ftl, btr);
-
-	//topp->setName("top");
-	//topp->drawRect(topvec);
-	//topp->setContentSize(Size(2 * maxextend, 2 * maxextend));
-	//_layer3D->addChild(topp);
-	//faces[2] = topp;
-
-
-	//DrawNode3D* btmp = DrawNode3D::create();
-	//Vec3 btmvec[4] = { fbr, fbl, bbl, bbr };
-	//btmp->setab(fbr, bbl);
-	//btmp->setName("bottom");
-	//btmp->drawRect(btmvec);
-	//btmp->setContentSize(Size(2 * maxextend, 2 * maxextend));
-	//_layer3D->addChild(btmp);
-	//faces[3] = btmp;
-
-	//DrawNode3D* leftp = DrawNode3D::create();
-	//Vec3 leftvec[4] = { ftl, fbl, bbl, btl };
-	//leftp->setab(fbl, btl);
-	//leftp->setName("left");
-	//leftp->drawRect(leftvec);
-	//leftp->setContentSize(Size(2 * maxextend, 2 * maxextend));
-	//_layer3D->addChild(leftp);
-	//faces[4] = leftp;
-
-
-	//DrawNode3D* rightp = DrawNode3D::create();
-	//rightp->setab(fbr, btr);
-	//rightp->setName("right");
-	//Vec3 rightvec[4] = { ftr, btr, bbr, fbr };
-	//rightp->drawRect(rightvec);
-	//rightp->setContentSize(Size(2 * maxextend, 2 * maxextend));
-	//_layer3D->addChild(rightp);
-	//faces[5] = rightp;
-
-
-
-
-
+	layer3D2->addChild(frontlb);
+	layer3D2->addChild(backlb);
+	layer3D2->addChild(toplb);
+	layer3D2->addChild(bottomlb);
+	layer3D2->addChild(rightlb);
+	layer3D2->addChild(leftlb);
+	layer3D2->addChild(_drawGrid);
+	layer3D2->setCameraMask(2);
 
 
 
@@ -645,72 +720,10 @@ void HelloWorld::start() {
 	updateCameraTransform();
 
 
-	auto menu = Button::create("add.png", "add.png");
-	menu->setSizeType(Widget::SizeType::PERCENT);
-	menu->setSizePercent(Vec2(1, 1));
-	menu->ignoreContentAdaptWithSize(false);
-
-	menu->addTouchEventListener([=](Ref* pSender, Widget::TouchEventType type) {
-		if (type == Widget::TouchEventType::ENDED) {
-			addface();
-			_layer3D->setCameraMask(2);
-			auto ori_rotate = testface->getRotation3D();
-			ori_rotate.z += -90;
-			//ori_rotate.y += -90;
-
-			auto rot = RotateBy::create(1.0f, ori_rotate);
-			auto seq = Sequence::create(rot, CallFunc::create([=] {
-			//	_layer3D->removeChild(testface);
-
-				testface->removeAllChildrenWithCleanup(true);
-				_layer3D->removeChild(testface);
-
-				int arr[9] = { 0, 3, 6, 9, 12, 15, 18, 21, 24 };
-				for (auto arri : arr) {
-					auto me = _dn[arri];
-					_layer3D->addChild(me);
-					//_accAngle += dt * _arcSpeed;
-					//const float pi = (float)M_PI;
-					//if (_accAngle >= 2 * pi)
-					//	_accAngle -= 2 * pi;
-					//Quaternion q = _dn->getRotationQuat();
-					//auto ffff = me->getPosition3D();
-					const float pi = (float)M_PI;
-					//float ccradius = ffff.distance(Vec3(0,0,0));
-					//auto wtf = ccradius / cos(45 * pi / 180.0) / 2;
-					//auto o = 0;
-				
-					auto cs = cos(90 * pi / 180.0);
-					auto ss = sin(90 * pi / 180.0);
-					auto x = me->getPositionX();
-					auto y = me->getPositionY();
-					auto z = me->getPositionZ();
-					//testface->removeChild(me);
-					auto ab = me->getAABB();
-					
-					Vec3 testvec3[8];
-					ab.getCorners(testvec3);
-					auto testnode = DrawNode3D::create();
-					testnode->drawCube(testvec3, Color4F::RED);
-					_layer3D->addChild(testnode);
-					me->setPosition3D(Vec3(round(x * cs - y * ss), round(x * ss + y * cs),z));
-
-				//	me->setPosition3D(Vec3( round(x * cs - z * ss) , y, round(x * ss + z * cs)));
-					auto a = 0;
-					//cube_click(me);
-				}
-				_layer3D->setCameraMask(2);
-
-			
-			}),
-				NULL);
-	
-			testface->runAction(seq);
-		}
-	});
-	menu->setPosition(Vec2(10, 10));
-	//addChild(menu);
-
+	//for (int i = 0; i < 2; i++) {
+	//	shuffle();
+	//}
+	this->schedule(schedule_selector(HelloWorld::queuerun), 0.1);
 
 	auto listener1 = EventListenerTouchOneByOne::create();
 	listener1->setSwallowTouches(true);
@@ -736,39 +749,11 @@ void HelloWorld::start() {
 		ray._origin = snear;
 		ray._direction = sfar - snear;
 
-		//_layer3D->removeChild(debugray);
-		//debugray = DrawNode3D::create();
-		//debugray->drawLine(ray._origin, ray._direction, Color4F::WHITE);
-
-		//_layer3D->addChild(debugray);
 		_layer3D->setCameraMask(2);
 		float facedist = 0;
 		float cubedist = 0;
 		Sprite3D* targetface = nullptr;
 		Sprite3D* targetcube = nullptr;
-
-		//for (auto mf : faces) {
-		//	//
-		//	//auto abobj = mf->getAABB();
-		//	//Vec3 testvec3[8];
-		//	//abobj.getCorners(testvec3);
-		//	//auto testnode = DrawNode3D::create();
-		//	//testnode->drawCube(testvec3, Color4F::MAGENTA);
-		//	//mf->addChild(testnode);
-		//	//
-		//	if (ray.intersects(mf->getAABB())) {
-
-		//		auto ndist = mf->getPosition3D().distance(snear);
-		//		if (!dist) {
-		//			dtarget = mf;
-		//			dist = ndist;
-		//		}
-		//		else if (ndist < dist) {
-		//			dtarget = mf;
-		//			dist = ndist;
-		//		}
-		//	}
-		//}
 
 		for (auto da : _dn2) {
 			if (ray.intersects(da->getAABB())) {
@@ -798,12 +783,6 @@ void HelloWorld::start() {
 			}
 		}
 
-		//if (dtarget) {
-		//	activeface = dtarget;
-		//	activelocation = location;
-		//	return true;
-		//}
-
 		if (targetface) {
 			activeface = targetface;
 			activecube = targetcube;
@@ -812,13 +791,6 @@ void HelloWorld::start() {
 			return true;
 		}
 
-
-		//if (ttarget) {
-		//	activecube = ttarget;
-		//	activelocation = location;
-		//	//ttarget->setPosition3D(Vec3(50, 50, 50));
-		//	return true;
-		//}
 		return false;
 	};
 
@@ -1193,7 +1165,6 @@ void HelloWorld::start() {
 		}
 
 		if (!touchface.compare("top")) {
-			auto ccc = _dn_top;
 			for (auto da : _dn_top) {
 				if (ray.intersects(da->getAABB())) {
 
@@ -1274,7 +1245,6 @@ void HelloWorld::start() {
 
 
 		if (!touchface.compare("bottom")) {
-			auto ccc = _dn_bottom;
 			for (auto da : _dn_bottom) {
 				if (ray.intersects(da->getAABB())) {
 
@@ -1352,159 +1322,42 @@ void HelloWorld::start() {
 				}
 			}
 		}
-
-
-		//auto vdebug = DrawNode3D::create();
-		//vdebug->setPosition3D();
-		//auto cpos = activecube->getPosition3D();
-		//auto apos = convertToWorldSpace3D(this, cpos);
-		//auto aapos = apos;
-		//aapos.y += 100;
-		//vdebug->drawLine(apos, aapos, Color4F::MAGENTA);
-		//addChild(vdebug);
-		//int direction;
-		//auto rq = _rotationQuat;
-		/*if (!touchface.compare("front")) {
-			if (rq.x < 0.5 && rq.y < 0.5 && rq.z < 0.5 && rq.w >= 0.5) {
-				
-				if (abs(xdiff) < abs(ydiff)) {
-					targetaxis = AXISX;
-					direction = (ydiff > 0) ? -1 : 1;
-				}
-				else {
-					targetaxis = AXISY;
-					direction = (xdiff > 0) ? -1 : 1;
-
-				}
-			}
-			if (rq.x < 0.5 && rq.y < 0.5 && rq.z >= 0.5 && rq.w < 0.5) {
-				direction = (ydiff > xdiff) ? 1 : -1;
-				if (abs(xdiff) < abs(ydiff)) {
-					targetaxis = AXISY;
-				}
-				else {
-					targetaxis = AXISX;
-				}
-			}
-			if (rq.x < 0.5 && rq.y < 0.5 && rq.z < -0.5 && rq.w >= 0.5) {
-				direction = (ydiff > xdiff) ? 1 : -1;
-				if (abs(xdiff) < abs(ydiff)) {
-					targetaxis = AXISY;
-				}
-				else {
-					targetaxis = AXISX;
-				}
-			}
-			if (rq.x < 0.5 && rq.y < 0.5 && rq.z >= 0.5 && rq.w >= 0.5) {
-				direction = (ydiff > xdiff) ? 1 : -1;
-				if (abs(xdiff) < abs(ydiff)) {
-					targetaxis = AXISY;
-				}
-				else {
-					targetaxis = AXISX;
-				}
-			}
-
-		}
-*/
-	
-
-
-	/*	if (touchaxis == AXISX) {
-
-			auto mode = calcrq(_rotationQuat);
-			if (mode == '-') {
-				mode = calcrq2(_rotationQuat);
-				auto tmpdiff = xdiff;
-				xdiff = ydiff;
-				ydiff = tmpdiff;
-				if (abs(xdiff) < abs(ydiff)) {
-					targetaxis = AXISY;
-				}
-				else {
-					targetaxis = AXISX;
-				}
-			}
-			else {
-				if (abs(xdiff) < abs(ydiff)) {
-					targetaxis = AXISX;
-				}
-				else {
-					targetaxis = AXISY;
-				}
-			}
-			
-			if (abs(xdiff) < abs(ydiff)) {
-				int direction;
-				if (mode == 'A') {
-					direction = (ydiff > 0) ? -1 : 1;
-				}
-				if (mode == 'B') {
-					direction = (ydiff > 0) ? 1 : -1;
-				}
-				if (mode == 'C') {
-					direction = (ydiff > 0) ? 1 : -1;
-				}
-				if (mode == 'D') {
-					direction = (ydiff > 0) ? -1 : 1;
-				}
-				setActiveGroup(targetaxis, activecube, direction);
-			}
-			else {
-				int direction;
-				if (mode == 'A') {
-					direction = (xdiff > 0) ? -1 : 1;
-				}
-				if (mode == 'B') {
-					direction = (xdiff > 0) ? -1 : 1;
-				}
-				if (mode == 'C') {
-					direction = (xdiff > 0) ? 1 : -1;
-				}
-				if (mode == 'D') {
-					direction = (xdiff > 0) ? 1 : -1;
-				}
-
-				setActiveGroup(targetaxis, activecube, direction );
-			}
-			
-		}*/
-
-
-
-
-
-		//auto location = touch->getLocationInView();
-
-		//auto newlocation = activecube->getPosition3D();
-		//auto xdiff = activelocation.x - location.x;
-		//auto ydiff = activelocation.y - location.y;
-		//	log("%f , %f", xdiff, ydiff);
-		//auto touchaxis = activeface->getTag();
-
-		//if (touchaxis != AXISZ) {
-		//	if (abs(xdiff) < abs(ydiff)) {
-		//		// y no change
-		//		setActiveGroup(AXISX, activecube, ydiff > 0);
-		//	}
-		//	else {
-		//		// x no change
-		//		setActiveGroup(AXISY, activecube, xdiff > 0);
-
-		//	}
-		//}
-		//else {
-		//	setActiveGroup(AXISZ, activecube, xdiff > 0);
-		//}
-
 		return true;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener1, this);
 }
 
+void HelloWorld::queuerun(float dt) {
+	if (!running) {
+		if (!queues.empty()) {
+			auto q = queues.back();
+			setActiveGroup(q.axis, q.cube, q.dir);
+			queues.pop_back();
+		}
+	}
+}
+void HelloWorld::shuffle() {
+	queue q;
+	
+	auto face = RandomHelper::random_int(0, 5);
+	//auto randaxis = getRandFaceAxis(face);
+	//auto randcube = getfacecubes(face);
+	auto randaxis = RandomHelper::random_int(0, 2);
+	auto randcube = _dn[RandomHelper::random_int(0, 26)];
+	auto randdirection = RandomHelper::random_int(0, 1) ? 1 : -1;
+	
+	q.axis = randaxis;
+	q.cube = randcube;
+	q.dir = randdirection;
+	queues.push_back(q);
+}
+
 
 void HelloWorld::setActiveGroup(int axis, Sprite3D* sp, int direction) {
-	
+	if (running) {
+		return;
+	}
+	running = 1;
 	testface = Node::create();
 	testface->setPosition3D(Vec3(0, 0, 0));
 	testface->setAnchorPoint(Vec2(0, 0));
@@ -1548,19 +1401,14 @@ void HelloWorld::setActiveGroup(int axis, Sprite3D* sp, int direction) {
 		ori_rotate.z += 90 * direction;
 	}
 
-
-
-	auto rot = RotateBy::create(1.0f, ori_rotate);
+	auto rot = RotateBy::create(0.5f, ori_rotate);
 	auto seq = Sequence::create(rot, CallFunc::create([=] {
-
 	    testface->removeAllChildren();
 		_layer3D->removeChild(testface);
 		
 		for (auto c : tmpcubes) {
 			cube* me = dynamic_cast<cube*>(c);
 			_layer3D->addChild(me);
-			
-			
 			const float pi = (float)M_PI;
 			auto cs = cos(direction * 90 * pi / 180.0);
 			auto ss = sin(direction * 90 * pi / 180.0);
@@ -1568,13 +1416,12 @@ void HelloWorld::setActiveGroup(int axis, Sprite3D* sp, int direction) {
 			auto x = me->getPositionX();
 			auto y = me->getPositionY();
 			auto z = me->getPositionZ();
-			auto ab = me->getAABB();
 
-			Vec3 testvec3[8];
-			ab.getCorners(testvec3);
-			auto testnode = DrawNode3D::create();
-			testnode->drawCube(testvec3, Color4F::RED);
-			//_layer3D->addChild(testnode);
+			//auto ab = me->getAABB();
+			//Vec3 testvec3[8];
+			//ab.getCorners(testvec3);
+			//auto testnode = DrawNode3D::create();
+			//testnode->drawCube(testvec3, Color4F::RED);
 			if (axis == AXISZ) {
 				auto oriquat = me->getRotationQuat();
 				me->setRotationQuat(Quaternion(0, 0, 0, 1));
@@ -1582,7 +1429,6 @@ void HelloWorld::setActiveGroup(int axis, Sprite3D* sp, int direction) {
 				auto newquat = me->getRotationQuat();
 				me->setRotationQuat(newquat * oriquat);
 				me->setPosition3D(Vec3(round(x * cs + y * ss), round(-x * ss + y * cs), z));
-				
 			}
 			else if (axis == AXISX) {
 			
@@ -1604,154 +1450,101 @@ void HelloWorld::setActiveGroup(int axis, Sprite3D* sp, int direction) {
 
 				me->setPosition3D(Vec3(round(x * cs + z * ss), y, round(-x * ss + z * cs)));
 			}
-
 		}
-		_layer3D->setCameraMask(2);
+	
+		if (isSolve()) {
+			CCLOG("%s", "solved");
+		}
+		running = 0;
 	}), NULL);
-
 	testface->runAction(seq);
-	  
-  
-
 }
 
-void HelloWorld::addface() {
+void HelloWorld::addcube(Sprite3D* c, float x, float y, float z) {
+	c->setScale(8);
+	c->setRotation3D(Vec3(0, 0, 0));
+	cube* ccube = dynamic_cast<cube*>(c);
+	ccube->setori(x, y, z);
+	c->setPosition3D(Vec3(x, y, z));
+}
 
-	testface = Node::create();
-	testface->setPosition3D(Vec3(0, 0, 0));
-	testface->setAnchorPoint(Vec2(0, 0));
-	_layer3D->addChild(testface);
-	auto a = cocos2d::RandomHelper::random_int(1, 60);
-	if (1) {
-		//int arr[9] = { 3, 4, 5, 12, 13, 14, 21, 22, 23 };
-		int arr[9] = { 0, 3, 6, 9, 12, 15, 18, 21, 24 };
-		for (auto arri : arr) {
-		/*	auto a = _dn[arri]->getPosition3D();
-			auto pos = convertToNodeSpace3D(this, _dn[arri]->getPosition3D());*/
-			
-			testface->addChild(_dn[arri]);
-	/*		_layer3D->removeChild(_dn[arri]);
-			
-			_dn[arri]->setPosition3D(pos);*/
+bool HelloWorld::isSolve() {
+	for (auto a : _dn) {
+		cube* ccube = dynamic_cast<cube*>(a);
+		if (!ccube->inpos()) {
+			return false;
 		}
-		//testface->addChild(_dn[3]);
-		//testface->addChild(_dn[4]);
-		//testface->addChild(_dn[5]);
-		//testface->addChild(_dn[12]);
-		//testface->addChild(_dn[13]);
-		//testface->addChild(_dn[14]);
-		//testface->addChild(_dn[21]);
-		//testface->addChild(_dn[22]);
-		//testface->addChild(_dn[23]);
-		//_layer3D->removeChild(_dn[3]);
-		//_layer3D->removeChild(_dn[4]);
-		//_layer3D->removeChild(_dn[5]);
-		//_layer3D->removeChild(_dn[12]);
-		//_layer3D->removeChild(_dn[13]);
-		//_layer3D->removeChild(_dn[14]);
-		//_layer3D->removeChild(_dn[21]);
-		//_layer3D->removeChild(_dn[22]);
-		//_layer3D->removeChild(_dn[23]);
 	}
-	else {
-		testface->addChild(_dn[0]);
-		testface->addChild(_dn[1]);
-		testface->addChild(_dn[2]);
-		testface->addChild(_dn[9]);
-		testface->addChild(_dn[10]);
-		testface->addChild(_dn[11]);
-		testface->addChild(_dn[18]);
-		testface->addChild(_dn[19]);
-		testface->addChild(_dn[20]);
-	}
-	//testface->setContentSize(Size(17,17));
-
+	return true;
 }
-
-void HelloWorld::addcube(Sprite3D* cube, float x, float y, float z) {
-	Vec3 a[8] = {
-		Vec3(0, 5, 5),
-		Vec3(0, 0, 5),
-		Vec3(5, 0, 5),
-		Vec3(5, 5, 5),
-		Vec3(5, 5, 0),
-		Vec3(5, 0, 0),
-		Vec3(0, 0, 0),
-		Vec3(0, 5, 0)
-	};
-	cube->setScale(5);
-	
-	//Sprite3DMaterial::createWithProperties()
-	//cube->setAnchorPoint(Vec2(0, 0));
-	//auto mat = Sprite3DMaterial::createWithFilename("Sprite3DTest/VertexColor.material");
-	cube->setRotation3D(Vec3(0, 0, 0));
-//	cube->setMaterial(mat);
-	auto rc = cocos2d::RandomHelper::random_int(1, 5);
-
-//cube->setColor(randcolor[rc]);
-
-//	auto mat = Sprite3DMaterial::createWithFilename("Sprite3DTest/VertexColor.material");
-	//cube->setMaterial(mat);
-	//cube->setShaderProgram()
-
-
-	cube->setPosition3D(Vec3(x, y, z));
-
-
-	
-
-
-
-}
-
 
 void HelloWorld::update(float dt) {
-	//iturn += 1;
-
-
-	/*Quaternion qa(iturn, iturn, iturn, 0);
-	_dn->setRotationQuat(qa);*/
-	//
-	//_accAngle += dt * _arcSpeed;
-	//const float pi = (float)M_PI;
-	//if (_accAngle >= 2 * pi)
-	//	_accAngle -= 2 * pi;
-	//Quaternion q = _dn->getRotationQuat();
-	//_dn->setPosition3D(Vec3( -2.5 + _cradius * cosf(_accAngle), 0,  -2.5 + _cradius * sinf(_accAngle)));
-
-	//Quaternion quat;
-	//Quaternion::createFromAxisAngle(Vec3(0.f, 0.1f, 0.f), _accAngle , &quat);
-	////_dn->setRotation(iturn);
-	//_dn->setRotationQuat(quat);
-
 }
 
 
-Mat4 HelloWorld::getNodeToWorldSpaceMatrix(Node* node) {
-	Mat4 matrix;
-	matrix.translate(node->getPositionX(), node->getPositionY(), node->getPositionZ());
-	auto quat = node->getRotationQuat();
-	matrix.rotate(quat);
-	matrix.scale(node->getScaleX(), node->getScaleY(), node->getScaleZ());
 
-	if (node->getParent() != nullptr) {
-		Mat4 parentMatrix = HelloWorld::getNodeToWorldSpaceMatrix(node->getParent());
-		parentMatrix.multiply(matrix);
-		matrix = parentMatrix;
+void HelloWorld::cubemove(int face, int dir) {
+	Sprite3D* facecube = nullptr;
+	int targetaxis;
+	if (face == 0) {
+		auto pos = _dn2[0]->getPosition3D().z - (cubesize / 2);
+		for (auto a : _dn) {
+			if (a->getPosition3D().z == pos) {
+				facecube = a;
+				targetaxis = AXISZ;
+				break;
+			}
+		}
 	}
-	return matrix;
-}
-Vec3 HelloWorld::convertToWorldSpace3D(Node* container, Vec3 position) {
-	Vec3 result = position;
-	Mat4 mat = getNodeToWorldSpaceMatrix(container);
-	mat.transformPoint(&result);
-	return result;
-}
-
-Vec3 HelloWorld::convertToNodeSpace3D(Node* container, Vec3 position) {
-	Vec3 result = position;
-	Mat4 mat = getNodeToWorldSpaceMatrix(container);
-	mat.inverse();
-	mat.transformPoint(&result);
-	return result;
+	if (face == 1) {
+		auto pos = _dn2[1]->getPosition3D().z + (cubesize / 2);
+		for (auto a : _dn) {
+			if (a->getPosition3D().z == pos) {
+				facecube = a;
+				targetaxis = AXISZ;
+				break;
+			}
+		}
+	}
+	if (face == 2) {
+		auto pos = _dn2[2]->getPosition3D().y - (cubesize / 2);
+		for (auto a : _dn) {
+			if (a->getPosition3D().y == pos) {
+				facecube = a;
+				targetaxis = AXISY;
+				break;
+			}
+		}
+	}
+	if (face == 3) {
+		auto pos = _dn2[3]->getPosition3D().y + (cubesize / 2);
+		for (auto a : _dn) {
+			if (a->getPosition3D().y == pos) {
+				facecube = a;
+				targetaxis = AXISY;
+				break;
+			}
+		}
+	}
+	if (face == 4) {
+		auto pos = _dn2[4]->getPosition3D().x - (cubesize / 2);
+		for (auto a : _dn) {
+			if (a->getPosition3D().x == pos) {
+				facecube = a;
+				targetaxis = AXISX;
+				break;
+			}
+		}
+	}
+	if (face == 5) {
+		auto pos = _dn2[5]->getPosition3D().x + (cubesize / 2);
+		for (auto a : _dn) {
+			if (a->getPosition3D().x == pos) {
+				facecube = a;
+				targetaxis = AXISX;
+				break;
+			}
+		}
+	}
+	setActiveGroup(targetaxis, facecube, dir);
 }
