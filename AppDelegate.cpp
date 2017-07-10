@@ -23,18 +23,21 @@ void AppDelegate::initGLContextAttrs()
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
+
     // initialize director
     auto director = Director::getInstance();
     auto glview = director->getOpenGLView();
     if(!glview) {
-        glview = GLViewImpl::createWithRect("rubiks-cube", Rect(0, 0, 960, 640));
+        glview = GLViewImpl::createWithRect("rubiks-cube", Rect(0, 0, 320, 568));
         director->setOpenGLView(glview);
     }
 
-    director->getOpenGLView()->setDesignResolutionSize(960, 640, ResolutionPolicy::SHOW_ALL);
+	auto buffer = experimental::FrameBuffer::getOrCreateDefaultFBO(glview);
+	buffer->setClearColor(Color4F(0.184, 0.310, 0.310, 1.0f));
+    director->getOpenGLView()->setDesignResolutionSize(320, 560, ResolutionPolicy::SHOW_ALL);
 
     // turn on display FPS
-    director->setDisplayStats(true);
+    director->setDisplayStats(false);
 
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
