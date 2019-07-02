@@ -1,0 +1,71 @@
+﻿  AppDelegate.cpp
+  cube.cpp
+  DrawNode3D.cpp
+  HelloWorldScene.cpp
+  main.cpp
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(58): warning C4996: 'cocos2d::LabelTTF': was declared deprecated (compiling source file ..\Classes\AppDelegate.cpp)
+  f:\vs\cocos2d-x-3.14\cocos\2d\cclabelttf.h(67): note: see declaration of 'cocos2d::LabelTTF' (compiling source file ..\Classes\AppDelegate.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(286): warning C4305: '=': truncation from 'double' to 'float' (compiling source file ..\Classes\AppDelegate.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(295): warning C4305: '=': truncation from 'double' to 'float' (compiling source file ..\Classes\AppDelegate.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(304): warning C4305: '=': truncation from 'double' to 'float' (compiling source file ..\Classes\AppDelegate.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(377): warning C4305: 'argument': truncation from 'double' to 'float' (compiling source file ..\Classes\AppDelegate.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(380): warning C4305: 'argument': truncation from 'double' to 'float' (compiling source file ..\Classes\AppDelegate.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(383): warning C4305: 'argument': truncation from 'double' to 'float' (compiling source file ..\Classes\AppDelegate.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(386): warning C4305: 'argument': truncation from 'double' to 'float' (compiling source file ..\Classes\AppDelegate.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(58): warning C4996: 'cocos2d::LabelTTF': was declared deprecated (compiling source file ..\Classes\HelloWorldScene.cpp)
+  f:\vs\cocos2d-x-3.14\cocos\2d\cclabelttf.h(67): note: see declaration of 'cocos2d::LabelTTF' (compiling source file ..\Classes\HelloWorldScene.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\appdelegate.cpp(36): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\appdelegate.cpp(43): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(286): warning C4305: '=': truncation from 'double' to 'float' (compiling source file ..\Classes\HelloWorldScene.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(295): warning C4305: '=': truncation from 'double' to 'float' (compiling source file ..\Classes\HelloWorldScene.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(304): warning C4305: '=': truncation from 'double' to 'float' (compiling source file ..\Classes\HelloWorldScene.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(377): warning C4305: 'argument': truncation from 'double' to 'float' (compiling source file ..\Classes\HelloWorldScene.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(380): warning C4305: 'argument': truncation from 'double' to 'float' (compiling source file ..\Classes\HelloWorldScene.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(383): warning C4305: 'argument': truncation from 'double' to 'float' (compiling source file ..\Classes\HelloWorldScene.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.h(386): warning C4305: 'argument': truncation from 'double' to 'float' (compiling source file ..\Classes\HelloWorldScene.cpp)
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(634): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(642): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(652): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(662): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(672): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(687): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(695): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(705): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(715): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(725): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(740): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(748): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(758): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(768): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(778): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(794): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(802): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(812): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(822): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(832): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(847): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(856): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(866): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(876): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(886): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(901): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(909): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(919): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(929): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(939): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(1013): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(1024): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(254): warning C4996: 'cocos2d::LabelTTF::create': was declared deprecated
+  f:\vs\cocos2d-x-3.14\cocos\2d\cclabelttf.h(83): note: see declaration of 'cocos2d::LabelTTF::create'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(1738): warning C4305: '+=': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(2035): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(2038): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(2041): warning C4305: 'argument': truncation from 'double' to 'float'
+f:\vs\cocos2d-x-3.14\rubiks-cube\classes\helloworldscene.cpp(2044): warning C4305: 'argument': truncation from 'double' to 'float'
+  49 File(s) copied
+AppDelegate.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
+     Creating library F:\vs\cocos2d-x-3.14\rubiks-cube\proj.win32\Debug.win32\rubiks-cube.lib and object F:\vs\cocos2d-x-3.14\rubiks-cube\proj.win32\Debug.win32\rubiks-cube.exp
+  rubiks-cube.vcxproj -> F:\vs\cocos2d-x-3.14\rubiks-cube\proj.win32\Debug.win32\rubiks-cube.exe
+  rubiks-cube.vcxproj -> F:\vs\cocos2d-x-3.14\rubiks-cube\proj.win32\Debug.win32\rubiks-cube.pdb (Full PDB)
+  F:\vs\cocos2d-x-3.14\rubiks-cube\Resources\Sprite3DTest\box_VertexCol.c3t -> F:\vs\cocos2d-x-3.14\rubiks-cube\proj.win32\Debug.win32\Sprite3DTest\box_VertexCol.c3t
+  1 File(s) copied
